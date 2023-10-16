@@ -37,7 +37,7 @@ class CountDownTimerView(context: Context, attrs: AttributeSet) : View(context, 
     }
 
     fun startTimer(totalTimeInMillis: Long) {
-        val minutes = totalTimeInMillis * 60 * 1000
+        val minutes = totalTimeInMillis * 1000
         this.totalTimeInMillis = minutes
 
         countDownTimer = CustomCountDownTimer(minutes, 1000) {
@@ -90,9 +90,9 @@ class CountDownTimerView(context: Context, attrs: AttributeSet) : View(context, 
         canvas.drawArc(oval, -90f, sweepAngle, false, progressPaint)
 
         // Sayacı çiz
-        val minutes = (timeRemaining / 1000 / 60).toInt()
-        val seconds = (timeRemaining / 1000 % 60).toInt()
-        val timeRemainingText = String.format("%02d:%02d", minutes, seconds)
+        val timeRemaining2 = countDownTimer?.getTimeRemaining() ?: totalTimeInMillis
+        val seconds = (timeRemaining2 / 1000 % 60).toInt()
+        val timeRemainingText = seconds.toString()
         canvas.drawText(timeRemainingText, centerX, centerY + textPaint.textSize / 4, textPaint)
     }
 }

@@ -13,6 +13,6 @@ class MainActivity : AppCompatActivity() {
 
         countDownTimerView = findViewById(R.id.countTimeDowner)
 
-        countDownTimerView.startTimer(1)
+        countDownTimerView.startTimer(40)
     }
 }
