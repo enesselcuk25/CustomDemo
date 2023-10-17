@@ -71,6 +71,13 @@ class CountDownTimerView(context: Context, attrs: AttributeSet) : View(context, 
         }
     }
 
+
+
+
+
+
+
+
     @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
@@ -85,16 +92,26 @@ class CountDownTimerView(context: Context, attrs: AttributeSet) : View(context, 
 
         // Progress'i çiz
         val timeRemaining = countDownTimer?.getTimeRemaining() ?: totalTimeInMillis
-        val progressRatio = 1.0 - (timeRemaining.toDouble() / totalTimeInMillis.toDouble()).coerceAtMost(1.0)
-        val sweepAngle = (360 * progressRatio).toFloat()
+        val seconds = (timeRemaining / 1000 % 60).toFloat()
+        val totalSeconds = (totalTimeInMillis / 1000).toFloat()
+
+        // Geriye doğru akışlı progress
+        val sweepAngle = 360 * (1 - seconds / totalSeconds)
         canvas.drawArc(oval, -90f, sweepAngle, false, progressPaint)
 
         // Sayacı çiz
-        val timeRemaining2 = countDownTimer?.getTimeRemaining() ?: totalTimeInMillis
-        val seconds = (timeRemaining2 / 1000 % 60).toInt()
-        val timeRemainingText = seconds.toString()
+        val timeRemainingText = seconds.toInt().toString()
         canvas.drawText(timeRemainingText, centerX, centerY + textPaint.textSize / 4, textPaint)
+
+        // Eğer saniye 1'e düştüyse, bir sonraki güncelleme için zamanlanmış bir işlem yap
+        if (seconds == 1f) {
+            postDelayed({
+                invalidate()
+            }, 1000)
+        } else {
+            // Başka bir çizim tetiklemek için görünümü geçersiz kılma
+            postInvalidateOnAnimation()
+        }
     }
+
 }
-
-
