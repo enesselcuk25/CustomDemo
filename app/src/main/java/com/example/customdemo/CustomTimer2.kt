@@ -12,76 +12,93 @@ import android.view.View
 import androidx.core.content.ContextCompat
 
 
-class CustomTimer2(context: Context, attrs: AttributeSet) : View(context, attrs) {
+class BaseTimer(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     private val circlePaint: Paint = Paint()
     private val progressPaint: Paint = Paint()
+    private val progressPaint2: Paint = Paint()
     private val textPaint: Paint = Paint()
     private var sweepAngle: Float = 0f
     private val maxSweepAngle = 360f
     private var animationDuration: Long = 0
-    private var elapsedSeconds: Long = 0
+    private var remainingTime: Long = 0
+    private var passing: Float = 0f
 
-    private var countDownTimer: CustomCountDownTimer? = null
+    private var countDownTimer: CountDownTimer? = null
 
     var onFinishListener: (() -> Unit)? = null
 
+    private var startAngle: Float = -90f  // Başlangıç açısı
+
     init {
-        circlePaint.color = ContextCompat.getColor(context, R.color.black)
+        circlePaint.color = MaterialColors.getColor(context,R.attr.defaultLineProgressTimerColor,null)
         circlePaint.style = Paint.Style.STROKE
         circlePaint.strokeWidth = 10f
         circlePaint.isAntiAlias = true
 
-        progressPaint.color = Color.LTGRAY
+        progressPaint.color = MaterialColors.getColor(context,R.attr.defaultLineProgressColor,null)
         progressPaint.style = Paint.Style.STROKE
         progressPaint.strokeWidth = 10f
         progressPaint.isAntiAlias = true
 
-        textPaint.color = ContextCompat.getColor(context, R.color.black)
+        progressPaint2.color = MaterialColors.getColor(context,R.attr.defaultLineProgressColor,null)
+        progressPaint2.style = Paint.Style.STROKE
+        progressPaint2.strokeWidth = 10f
+        progressPaint2.isAntiAlias = true
+
+        textPaint.color = MaterialColors.getColor(context,R.attr.defaultLineProgressTimerColor,null)
         textPaint.style = Paint.Style.FILL
         textPaint.textSize = 80f
         textPaint.textAlign = Paint.Align.CENTER
         textPaint.isAntiAlias = true
+
     }
 
-    fun startTimer(totalSeconds: Long) {
-        val milliseconds = totalSeconds * 1000
-        this.animationDuration = milliseconds
-         countDownTimer = CustomCountDownTimer(animationDuration,{ progress ->
-                sweepAngle = maxSweepAngle * progress
-                elapsedSeconds = (totalSeconds - (progress * totalSeconds)).toLong()
+    fun startTimer(timeToExpire: Long, sumTimer: Long) {
+        remainingTime = timeToExpire
+        animationDuration = sumTimer * 1000
+
+        val startProgress = sumTimer - timeToExpire
+        startAngle = -90f + (startProgress.toFloat() / sumTimer.toFloat()) * maxSweepAngle
+        sweepAngle = (startProgress.toFloat() / sumTimer.toFloat()) * maxSweepAngle
+
+        val normalizedStartProgress = startProgress.toFloat() / sumTimer.toFloat()
+        val valueBetweenZeroAndMaxSweep = normalizedStartProgress * maxSweepAngle
+        passing = -valueBetweenZeroAndMaxSweep
+
+        countDownTimer = object : CountDownTimer(animationDuration, 16) {
+            private val startTime = SystemClock.elapsedRealtime()
+
+            override fun onTick(millisUntilFinished: Long) {
+                val elapsedTime = SystemClock.elapsedRealtime() - startTime
+                val progress = elapsedTime.toFloat() / animationDuration
+
+                if (elapsedTime <= timeToExpire * 1000) {
+                    sweepAngle = maxSweepAngle * progress
+                    remainingTime = (timeToExpire - (elapsedTime / 1000))
+
+                } else {
+                    if (sweepAngle < maxSweepAngle) {
+                        sweepAngle = maxSweepAngle
+                    }
+                    remainingTime = 0
+                    countDownTimer?.cancel()
+                    onFinishListener?.invoke()
+
+                }
                 postInvalidateOnAnimation()
+            }
 
-        },{
-            onFinishListener?.invoke()
-        })
-
-        countDownTimer?.start()
-    }
-
-
-    fun stopTimer() {
-        countDownTimer?.cancel()
-    }
-
-    private class CustomCountDownTimer(
-        private val duration: Long,
-        private val onTick: (progress: Float) -> Unit,
-        private val onFinish: () -> Unit,
-    ) : CountDownTimer(duration, 16) {
-
-        override fun onTick(millisUntilFinished: Long) {
-            val progress = (duration - millisUntilFinished).toFloat() / duration
-            onTick(progress)
-        }
-
-        override fun onFinish() {
-            onTick(1f)
-            onFinish.invoke()
+            override fun onFinish() {
+                onFinishListener?.invoke()
+            }
         }
     }
 
-    @SuppressLint("DrawAllocation")
+    fun stopTimer() = countDownTimer?.cancel()
+
+    fun timerStart() = countDownTimer?.start()
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
@@ -90,13 +107,23 @@ class CustomTimer2(context: Context, attrs: AttributeSet) : View(context, attrs)
         val radius = centerX.coerceAtMost(centerY) - 10f
 
         val oval = RectF(centerX - radius, centerY - radius, centerX + radius, centerY + radius)
-        canvas.drawArc(oval, -90f, maxSweepAngle, false, circlePaint)
-        canvas.drawArc(oval, -90f + sweepAngle, maxSweepAngle - sweepAngle, false, progressPaint)
 
-        val secondsText = "$elapsedSeconds"
+        // circlePaint ile çemberi çiz
+        val ab = maxSweepAngle - startAngle - 90
+
+        canvas.drawArc(oval, startAngle, ab, false, circlePaint)
+
+        // progressPaint ile progress çizgisini çiz
+        canvas.drawArc(oval, startAngle, sweepAngle, false, progressPaint)
+
+        // servisten gelen sn gri yap
+        canvas.drawArc(oval, startAngle, passing, false, progressPaint2)
+
+        val secondsText = "$remainingTime"
         canvas.drawText(secondsText, centerX, centerY + textPaint.textSize / 4, textPaint)
     }
 }
+
 
 
 
