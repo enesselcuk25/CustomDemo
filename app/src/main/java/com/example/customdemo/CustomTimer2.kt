@@ -1,4 +1,4 @@
-package com.garantibbva.authsignsdk.uicomponents.components
+package com.example.customdemo
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -10,16 +10,16 @@ import android.os.CountDownTimer
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.ContextCompat
-import com.garantibbva.authsignsdk.R
 
-class BaseTimer2(context: Context, attrs: AttributeSet) : View(context, attrs) {
+
+class CustomTimer2(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     private val circlePaint: Paint = Paint()
     private val progressPaint: Paint = Paint()
     private val textPaint: Paint = Paint()
     private var sweepAngle: Float = 0f
     private val maxSweepAngle = 360f
-    private var animationDuration: Long = 0 // 5 saniye (ayarlayabilirsiniz)
+    private var animationDuration: Long = 0
     private var elapsedSeconds: Long = 0
 
     private var countDownTimer: CustomCountDownTimer? = null
@@ -27,7 +27,7 @@ class BaseTimer2(context: Context, attrs: AttributeSet) : View(context, attrs) {
     var onFinishListener: (() -> Unit)? = null
 
     init {
-        circlePaint.color = ContextCompat.getColor(context, R.color.defaultAccentColor)
+        circlePaint.color = ContextCompat.getColor(context, R.color.black)
         circlePaint.style = Paint.Style.STROKE
         circlePaint.strokeWidth = 10f
         circlePaint.isAntiAlias = true
@@ -37,7 +37,7 @@ class BaseTimer2(context: Context, attrs: AttributeSet) : View(context, attrs) {
         progressPaint.strokeWidth = 10f
         progressPaint.isAntiAlias = true
 
-        textPaint.color = ContextCompat.getColor(context, R.color.defaultAccentColor)
+        textPaint.color = ContextCompat.getColor(context, R.color.black)
         textPaint.style = Paint.Style.FILL
         textPaint.textSize = 80f
         textPaint.textAlign = Paint.Align.CENTER

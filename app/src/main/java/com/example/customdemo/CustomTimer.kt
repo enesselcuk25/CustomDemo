@@ -10,7 +10,7 @@ import android.os.CountDownTimer
 import android.util.AttributeSet
 import android.view.View
 
-class CountDownTimerView(context: Context, attrs: AttributeSet) : View(context, attrs) {
+class CustomTimer(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
   private val circlePaint: Paint = Paint()
     private val progressPaint: Paint = Paint()
