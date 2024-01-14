@@ -1,18 +1,18 @@
 package com.example.customdemo
 
-import android.annotation.SuppressLint
+
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.os.CountDownTimer
+import android.os.SystemClock
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.ContextCompat
 
 
-class BaseTimer(context: Context, attrs: AttributeSet) : View(context, attrs) {
+class CustomTimer2(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     private val circlePaint: Paint = Paint()
     private val progressPaint: Paint = Paint()
@@ -28,25 +28,25 @@ class BaseTimer(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     var onFinishListener: (() -> Unit)? = null
 
-    private var startAngle: Float = -90f  // Başlangıç açısı
+    private var startAngle: Float = -90f  // is start angle
 
     init {
-        circlePaint.color = MaterialColors.getColor(context,R.attr.defaultLineProgressTimerColor,null)
+        circlePaint.color = ContextCompat.getColor(context, R.color.purple)
         circlePaint.style = Paint.Style.STROKE
         circlePaint.strokeWidth = 10f
         circlePaint.isAntiAlias = true
 
-        progressPaint.color = MaterialColors.getColor(context,R.attr.defaultLineProgressColor,null)
+        progressPaint.color = ContextCompat.getColor(context, R.color.red)
         progressPaint.style = Paint.Style.STROKE
         progressPaint.strokeWidth = 10f
         progressPaint.isAntiAlias = true
 
-        progressPaint2.color = MaterialColors.getColor(context,R.attr.defaultLineProgressColor,null)
+        progressPaint2.color = ContextCompat.getColor(context, R.color.red)
         progressPaint2.style = Paint.Style.STROKE
         progressPaint2.strokeWidth = 10f
         progressPaint2.isAntiAlias = true
 
-        textPaint.color = MaterialColors.getColor(context,R.attr.defaultLineProgressTimerColor,null)
+        textPaint.color = ContextCompat.getColor(context, R.color.purple)
         textPaint.style = Paint.Style.FILL
         textPaint.textSize = 80f
         textPaint.textAlign = Paint.Align.CENTER
@@ -98,6 +98,7 @@ class BaseTimer(context: Context, attrs: AttributeSet) : View(context, attrs) {
     fun stopTimer() = countDownTimer?.cancel()
 
     fun timerStart() = countDownTimer?.start()
+    fun refresh() = countDownTimer?.onFinish()
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)

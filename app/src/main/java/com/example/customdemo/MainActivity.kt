@@ -25,20 +25,18 @@ private lateinit var binding: ActivityMainBinding
      binding = ActivityMainBinding.inflate(layoutInflater)
      setContentView(binding.root)
 
-        binding.countTimeDowner.startTimer(10)
-
-        binding.btnTKla.setOnClickListener {
-            DemoSdk.demoHairOrder?.invoke("enes")
-
-            val intent = Intent(this@MainActivity, MainActivity::class.java)
-            this@MainActivity.startActivity(intent)
-        }
+        binding.countTimeDowner.startTimer(10,40)
 
     }
 
     override fun onResume() {
         super.onResume()
+        binding.countTimeDowner.timerStart()
+    }
 
+    override fun onPause() {
+        super.onPause()
+        binding.countTimeDowner.stopTimer()
     }
 
 }
